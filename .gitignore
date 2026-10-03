@@ -1,0 +1,27 @@
+# Virtual environments
+arag/
+.venv/
+venv/
+ENV/
+
+# Python cache and bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.pyright/
+
+# Environment variables
+*.env
+!.example.env
+!settings.example.env
+
+# Logs and outputs
+*.log
+evaluation/runs/
+dist/
+build/
+*.egg-info/
