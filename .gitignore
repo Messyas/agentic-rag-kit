@@ -1,8 +1,8 @@
 # Virtual environments
-arag/
 .venv/
 venv/
 ENV/
+arag/
 
 # Python cache and bytecode
 __pycache__/
@@ -15,7 +15,9 @@ __pycache__/
 .pyright/
 
 # Environment variables
+.env
 *.env
+!.env.example
 !.example.env
 !settings.example.env
 

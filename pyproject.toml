@@ -1,22 +1,81 @@
-[project]
-name = "agentic-rag-kit"
-version = "0.1.0"
-description = "Hexagonal agentic RAG kit with pluggable domain packs"
-readme = "README.md"
-requires-python = ">=3.11"
-dependencies = []
-
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
+[project]
+name = "rag-kit"
+version = "0.1.0"
+description = "Reusable agentic RAG kit"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "pydantic",
+    "pydantic-settings",
+    "httpx",
+    "ollama",
+    "sqlalchemy[asyncio]",
+    "psycopg[binary,pool]",
+    "pgvector",
+    "alembic",
+    "pandas",
+    "openpyxl",
+    "pandera",
+    "numpy",
+    "jinja2",
+    "tenacity",
+    "structlog",
+    "typer",
+    "orjson",
+]
+
+[project.optional-dependencies]
+eval = [
+    "scikit-learn",
+    "psutil",
+    "rich",
+]
+dev = [
+    "pytest",
+    "pytest-asyncio",
+    "pytest-cov",
+    "ruff",
+    "pyright",
+    "import-linter",
+    "pre-commit",
+]
+rerank = [
+    "sentence-transformers",
+]
+bm25 = [
+    "rank-bm25",
+]
+api = [
+    "fastapi",
+    "uvicorn",
+]
+worker = [
+    "taskiq",
+]
+gateway = [
+    "litellm",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/rag_kit"]
+
 [tool.ruff]
 line-length = 100
-target-version = "py311"
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B"]
+ignore = ["BLE001"]
 
 [tool.pyright]
-include = ["src", "packs", "evaluation", "tests"]
-pythonVersion = "3.11"
+include = ["src", "tests", "scripts"]
+pythonVersion = "3.12"
+venvPath = "."
+venv = ".venv"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
