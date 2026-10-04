@@ -109,6 +109,16 @@ pytest --version
 lint-imports --help
 ```
 
+### Configuração de Git Hooks (Pre-commit)
+Para instalar os hooks automáticos de validação antes de cada commit:
+```bash
+pre-commit install
+```
+E para executar manualmente em todos os arquivos:
+```bash
+pre-commit run --all-files
+```
+
 ---
 
 ## 5. Diretrizes de Privacidade e Execução Local

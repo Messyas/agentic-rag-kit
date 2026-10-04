@@ -1,6 +1,6 @@
 [build-system]
-requires = ["hatchling"]
-build-backend = "hatchling.build"
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
 
 [project]
 name = "rag-kit"
@@ -60,26 +60,114 @@ gateway = [
     "litellm",
 ]
 
-[tool.hatch.build.targets.wheel]
-packages = ["src/rag_kit"]
+[project.scripts]
+rag-kit = "rag_kit.interfaces.cli:app"
+
+[tool.setuptools.packages.find]
+where = ["src", "."]
+include = ["rag_kit*", "packs*", "evaluation*"]
 
 [tool.ruff]
 line-length = 100
-target-version = "py312"
+target-version = "py311"
+src = ["src", "packs", "evaluation", "tests"]
+exclude = [".venv", "arag", ".git", "__pycache__"]
 
 [tool.ruff.lint]
-select = ["E", "F", "I", "B"]
+select = [
+  "E", "F", "I", "UP", "B", "SIM", "ASYNC", "S", "PL", "RUF", "C4", "PT", "TCH", "ARG",
+  "FBT",   # no boolean flag parameters (Charter F4)
+  "N",     # naming conventions (Charter N)
+  "ERA",   # no commented-out code (Charter S2)
+  "C90",   # cyclomatic complexity (Charter F2)
+  "TRY", "RET", "PIE",
+]
 ignore = ["BLE001"]
 
+[tool.ruff.lint.pylint]
+max-args = 5          # self + 4
+max-returns = 4
+max-branches = 8
+max-statements = 25
+
+[tool.ruff.lint.mccabe]
+max-complexity = 8
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["S101", "PLR2004", "ARG001", "ARG002", "PLR0913", "FBT001", "FBT002"]
+"scripts/**" = [
+  "PLC0415", "T201", "S101", "BLE001", "RUF100", "S603", "PLR0915", "PLR0911", "PLR2004", "TRY300"
+]
+
 [tool.pyright]
-include = ["src", "tests", "scripts"]
-pythonVersion = "3.12"
+include = ["src", "packs"]
+pythonVersion = "3.11"
+typeCheckingMode = "strict"
+reportMissingTypeStubs = false
 venvPath = "."
 venv = ".venv"
 
 [tool.pytest.ini_options]
+asyncio_mode = "auto"
 testpaths = ["tests"]
-pythonpath = ["src"]
+pythonpath = ["src", "."]
+markers = [
+  "integration: needs docker postgres",
+  "gpu: needs CUDA",
+  "slow: long running",
+]
+addopts = "-q --strict-markers"
+
+[tool.coverage.run]
+branch = true
+source = ["src/rag_kit"]
+
+[tool.coverage.report]
+fail_under = 80
+show_missing = true
 
 [tool.importlinter]
-root_package = "rag_kit"
+root_packages = ["rag_kit", "packs"]
+include_external_packages = true
+
+[[tool.importlinter.contracts]]
+name = "Domain is pure"
+type = "forbidden"
+source_modules = ["rag_kit.domain"]
+forbidden_modules = [
+  "rag_kit.application", "rag_kit.infrastructure", "rag_kit.bootstrap", "rag_kit.interfaces", "packs",
+  "sqlalchemy", "psycopg", "httpx", "ollama", "pandas", "fastapi", "taskiq", "torch",
+  "sentence_transformers", "structlog",
+]
+
+[[tool.importlinter.contracts]]
+name = "Application never imports infrastructure or frameworks"
+type = "forbidden"
+source_modules = ["rag_kit.application"]
+forbidden_modules = [
+  "rag_kit.infrastructure", "rag_kit.bootstrap", "rag_kit.interfaces",
+  "sqlalchemy", "psycopg", "ollama", "httpx", "torch", "sentence_transformers", "fastapi", "taskiq",
+]
+
+[[tool.importlinter.contracts]]
+name = "Infrastructure depends on domain only"
+type = "forbidden"
+source_modules = ["rag_kit.infrastructure"]
+forbidden_modules = ["rag_kit.application", "rag_kit.bootstrap", "rag_kit.interfaces"]
+
+[[tool.importlinter.contracts]]
+name = "Interfaces never touch infrastructure directly"
+type = "forbidden"
+source_modules = ["rag_kit.interfaces"]
+forbidden_modules = ["rag_kit.infrastructure"]
+
+[[tool.importlinter.contracts]]
+name = "Packs depend on domain and application only"
+type = "forbidden"
+source_modules = ["packs"]
+forbidden_modules = ["rag_kit.infrastructure", "rag_kit.bootstrap", "rag_kit.interfaces"]
+
+[[tool.importlinter.contracts]]
+name = "Layered architecture"
+type = "layers"
+layers = ["rag_kit.interfaces", "rag_kit.bootstrap", "rag_kit.application", "rag_kit.domain"]

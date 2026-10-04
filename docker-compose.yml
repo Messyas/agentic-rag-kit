@@ -1,0 +1,22 @@
+services:
+  db:
+    image: pgvector/pgvector:pg16
+    container_name: ragkit_db
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-ragkit}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-ragkit}
+      POSTGRES_DB: ${POSTGRES_DB:-ragkit}
+    volumes:
+      - pgvector_data:/var/lib/postgresql/data
+      - ./docker/initdb:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER:-ragkit} -d $${POSTGRES_DB:-ragkit}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  pgvector_data:

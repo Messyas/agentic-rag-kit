@@ -124,6 +124,7 @@ def check_ram_and_system() -> None:
 
     try:
         import torch
+
         device_name = torch.cuda.get_device_name(0) if torch.cuda.is_available() else "CPU"
         print(f"  PyTorch CUDA:    {torch.cuda.is_available()} (Dispositivo: {device_name})")
     except Exception as exc:  # noqa: BLE001
@@ -146,6 +147,7 @@ def check_postgres() -> None:
     print(f"  Tentando conectar a: {db_url} ...")
     try:
         from sqlalchemy import create_engine, text
+
         # If url starts with postgresql+psycopg, sync engine works or standard
         sync_url = db_url.replace("+asyncio", "")
         engine = create_engine(sync_url)

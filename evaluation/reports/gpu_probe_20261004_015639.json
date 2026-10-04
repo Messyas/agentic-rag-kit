@@ -1,0 +1,23 @@
+{
+  "timestamp": "2026-10-04T01:56:39.613258+00:00",
+  "nvidia_smi": {
+    "status": "available",
+    "name": "NVIDIA GeForce RTX 3070",
+    "memory_total_mb": 8192.0,
+    "memory_used_mb": 6232.0,
+    "memory_free_mb": 1787.0
+  },
+  "nvidia_smi_after": null,
+  "ollama_ps": {
+    "status": "available",
+    "raw": "NAME    ID    SIZE    PROCESSOR    CONTEXT    UNTIL"
+  },
+  "torch_cuda": {
+    "available": true,
+    "device_name": "NVIDIA GeForce RTX 3070",
+    "free_mb": 7114.0,
+    "total_mb": 8191.5,
+    "max_memory_allocated_mb": 0.0
+  },
+  "exercise": null
+}
