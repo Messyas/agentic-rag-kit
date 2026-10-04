@@ -49,7 +49,7 @@ class EmbeddingSettings(BaseModel):
 
 class RerankSettings(BaseModel):
     provider: Literal["none", "cross_encoder"] = "none"
-    model: str = "cross-encoder/ms-marco-MiniLM-L-6-v2"
+    model: str = "cross-encoder/ms-marco-MiniLM-L6-v2"
     device: Literal["cpu", "cuda"] = "cpu"
     batch_size: int = Field(default=16, gt=0)
     fp16: bool = True

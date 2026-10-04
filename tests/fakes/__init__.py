@@ -76,7 +76,9 @@ class InMemoryVectorStore:
             != (snapshot.ref.source_type, snapshot.ref.source_id)
         }
         self._source_hashes[(snapshot.ref.source_type, snapshot.ref.source_id)] = (
-            snapshot.ref.version, snapshot.content_hash, snapshot.embedder_id
+            snapshot.ref.version,
+            snapshot.content_hash,
+            snapshot.embedder_id,
         )
         return await self.upsert(
             snapshot.chunks, snapshot.embeddings, embedder_id=snapshot.embedder_id
@@ -84,7 +86,9 @@ class InMemoryVectorStore:
 
     async def source_is_current(self, ref: SourceRef, content_hash: str, embedder_id: str) -> bool:
         return self._source_hashes.get((ref.source_type, ref.source_id)) == (
-            ref.version, content_hash, embedder_id
+            ref.version,
+            content_hash,
+            embedder_id,
         )
 
     async def upsert(

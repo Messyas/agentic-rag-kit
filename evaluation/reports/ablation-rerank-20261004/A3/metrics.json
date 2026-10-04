@@ -1,0 +1,95 @@
+{
+  "case_count": 24,
+  "failure_count": 0,
+  "retrieval": {
+    "recall_at_k": 1.0,
+    "mean_reciprocal_rank": 1.0,
+    "hit_at_k": 1.0,
+    "case_count": 6
+  },
+  "figure_parity": {
+    "successes": 0,
+    "trials": 0,
+    "rate": 0.0,
+    "wilson_95": [
+      0.0,
+      0.0
+    ]
+  },
+  "abstention_correctness": {
+    "successes": 18,
+    "trials": 18,
+    "rate": 1.0,
+    "wilson_95": [
+      0.8241154494176252,
+      1.0
+    ]
+  },
+  "injection_resistance": {
+    "successes": 6,
+    "trials": 6,
+    "rate": 1.0,
+    "wilson_95": [
+      0.6096569663469354,
+      0.9999999999999999
+    ]
+  },
+  "consistency": {
+    "successes": 0,
+    "trials": 0,
+    "rate": 0.0,
+    "wilson_95": [
+      0.0,
+      0.0
+    ]
+  },
+  "valid_without_repairs": {
+    "successes": 18,
+    "trials": 24,
+    "rate": 0.75,
+    "wilson_95": [
+      0.5510017468789357,
+      0.8800079652065766
+    ]
+  },
+  "tool_call_accuracy": {
+    "successes": 0,
+    "trials": 0,
+    "rate": 0.0,
+    "wilson_95": [
+      0.0,
+      0.0
+    ]
+  },
+  "unnecessary_tool_calls": 0,
+  "outcome_accuracy": {
+    "successes": 18,
+    "trials": 24,
+    "rate": 0.75,
+    "wilson_95": [
+      0.5510017468789357,
+      0.8800079652065766
+    ]
+  },
+  "source_precision": 0.0,
+  "source_recall": 0.0,
+  "source_f1": 0.0,
+  "field_exactness": {
+    "exact": 0,
+    "total": 0,
+    "rate": 0.0
+  },
+  "latency": {
+    "mean_seconds": 1.1992184208332521,
+    "p95_seconds": 4.258064599998761,
+    "count": 24
+  },
+  "peak_ram_gb": 1.1235847473144531,
+  "peak_vram_gb": 7.2421875,
+  "prompt_tokens": 2478,
+  "completion_tokens": 1398,
+  "tokens_per_second": 50.10414440301136,
+  "cases_per_second": 0.8338764503843851,
+  "failures_by_type": {},
+  "warmup_errors": []
+}

@@ -1,12 +1,12 @@
-{"document_id": "R-SYN-42-0", "text": "Reviewed transport damage to pcb lot SYN-42-0.", "source_type": "scrap_review", "metadata": {"synthetic": true}}
-{"document_id": "R-SYN-42-4", "text": "Reviewed transport damage to case lot SYN-42-4.", "source_type": "scrap_review", "metadata": {"synthetic": true}}
-{"document_id": "R-SYN-42-8", "text": "Reviewed transport damage to pcb lot SYN-42-8.", "source_type": "scrap_review", "metadata": {"synthetic": true}}
-{"document_id": "R-SYN-42-12", "text": "Reviewed transport damage to pcb lot SYN-42-12.", "source_type": "scrap_review", "metadata": {"synthetic": true}}
-{"document_id": "R-SYN-42-16", "text": "Reviewed transport damage to panel lot SYN-42-16.", "source_type": "scrap_review", "metadata": {"synthetic": true}}
-{"document_id": "R-SYN-42-20", "text": "Reviewed transport damage to panel lot SYN-42-20.", "source_type": "scrap_review", "metadata": {"synthetic": true}}
-{"document_id": "R-SYN-42-24", "text": "Reviewed transport damage to pcb lot SYN-42-24.", "source_type": "scrap_review", "metadata": {"synthetic": true}}
-{"document_id": "R-SYN-42-28", "text": "Reviewed transport damage to pcb lot SYN-42-28.", "source_type": "scrap_review", "metadata": {"synthetic": true}}
-{"document_id": "R-SYN-42-32", "text": "Reviewed transport damage to case lot SYN-42-32.", "source_type": "scrap_review", "metadata": {"synthetic": true}}
-{"document_id": "R-SYN-42-36", "text": "Reviewed transport damage to panel lot SYN-42-36.", "source_type": "scrap_review", "metadata": {"synthetic": true}}
-{"document_id": "R-SYN-42-40", "text": "Reviewed transport damage to case lot SYN-42-40.", "source_type": "scrap_review", "metadata": {"synthetic": true}}
-{"document_id": "R-SYN-42-44", "text": "Reviewed transport damage to panel lot SYN-42-44.", "source_type": "scrap_review", "metadata": {"synthetic": true}}
+{"document_id": "R-SYN-42-0", "text": "Reviewed transport damage to pcb lot SYN-42-0.", "source_type": "scrap_review", "metadata": {"synthetic": true, "component_family": "pcb"}}
+{"document_id": "R-SYN-42-4", "text": "Reviewed transport damage to case lot SYN-42-4.", "source_type": "scrap_review", "metadata": {"synthetic": true, "component_family": "case"}}
+{"document_id": "R-SYN-42-8", "text": "Reviewed transport damage to pcb lot SYN-42-8.", "source_type": "scrap_review", "metadata": {"synthetic": true, "component_family": "pcb"}}
+{"document_id": "R-SYN-42-12", "text": "Reviewed transport damage to pcb lot SYN-42-12.", "source_type": "scrap_review", "metadata": {"synthetic": true, "component_family": "pcb"}}
+{"document_id": "R-SYN-42-16", "text": "Reviewed transport damage to panel lot SYN-42-16.", "source_type": "scrap_review", "metadata": {"synthetic": true, "component_family": "panel"}}
+{"document_id": "R-SYN-42-20", "text": "Reviewed transport damage to panel lot SYN-42-20.", "source_type": "scrap_review", "metadata": {"synthetic": true, "component_family": "panel"}}
+{"document_id": "R-SYN-42-24", "text": "Reviewed transport damage to pcb lot SYN-42-24.", "source_type": "scrap_review", "metadata": {"synthetic": true, "component_family": "pcb"}}
+{"document_id": "R-SYN-42-28", "text": "Reviewed transport damage to pcb lot SYN-42-28.", "source_type": "scrap_review", "metadata": {"synthetic": true, "component_family": "pcb"}}
+{"document_id": "R-SYN-42-32", "text": "Reviewed transport damage to case lot SYN-42-32.", "source_type": "scrap_review", "metadata": {"synthetic": true, "component_family": "case"}}
+{"document_id": "R-SYN-42-36", "text": "Reviewed transport damage to panel lot SYN-42-36.", "source_type": "scrap_review", "metadata": {"synthetic": true, "component_family": "panel"}}
+{"document_id": "R-SYN-42-40", "text": "Reviewed transport damage to case lot SYN-42-40.", "source_type": "scrap_review", "metadata": {"synthetic": true, "component_family": "case"}}
+{"document_id": "R-SYN-42-44", "text": "Reviewed transport damage to panel lot SYN-42-44.", "source_type": "scrap_review", "metadata": {"synthetic": true, "component_family": "panel"}}

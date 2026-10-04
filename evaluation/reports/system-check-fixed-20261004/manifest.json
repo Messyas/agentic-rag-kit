@@ -1,0 +1,23 @@
+{
+  "split": "dev",
+  "arms": [
+    "rule_baseline",
+    "simple_rag",
+    "corrective_rag",
+    "react_agent_native",
+    "react_agent_structured_json"
+  ],
+  "seed": 42,
+  "repeat_count": 1,
+  "warmup_cases": 0,
+  "dataset_sha256": "16db8b81b7ac7568a8ec9a6bda9259fbd6255ccd29a92b7ca9bc4f7c1bcf80d2",
+  "llm_model": "qwen2.5:7b-instruct-q4_K_M",
+  "embedding_model": "bge-m3",
+  "retrieval_mode": "hybrid",
+  "reranker": "none",
+  "prompt_sha256": {
+    "generator.v1.jinja": "40946532f64f68ee6761be5e2c9298868b2983626a34fbf05eb6673b86c9c902",
+    "grader.v1.jinja": "a5a4126da7b4817847f029fed07729c7a6c4e10ba1340b11d11224eb9e7174c0",
+    "agent_system.v1.jinja": "9ef92fbc9ac9018ba5c7fd2cad3710fa20b3c248d72d86c251beaa849bb0faf1"
+  }
+}

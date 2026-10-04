@@ -88,6 +88,7 @@ production accuracy. Real inference requires the configured models to be install
 from rag_kit.bootstrap.container import Container
 from rag_kit.bootstrap.settings import Settings
 
+
 async def analyze_record(record):
     async with Container(Settings()) as container:
         facade = container.build_facade()

@@ -1,0 +1,13 @@
+{
+  "dataset_directory": "evaluation/datasets",
+  "output_directory": "evaluation\\reports\\ablation-rerank-20261004",
+  "split": "dev",
+  "arms": [
+    "A2",
+    "A3",
+    "A4",
+    "A5"
+  ],
+  "repeat_count": 1,
+  "warmup_cases": 0
+}

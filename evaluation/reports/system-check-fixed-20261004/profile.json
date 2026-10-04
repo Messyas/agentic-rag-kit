@@ -1,0 +1,14 @@
+{
+  "dataset_directory": "evaluation/datasets",
+  "output_directory": "evaluation\\reports\\system-check-fixed-20261004",
+  "split": "dev",
+  "arms": [
+    "rule_baseline",
+    "simple_rag",
+    "corrective_rag",
+    "react_agent_native",
+    "react_agent_structured_json"
+  ],
+  "repeat_count": 1,
+  "warmup_cases": 0
+}

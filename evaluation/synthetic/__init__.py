@@ -25,7 +25,7 @@ def generate_dataset(seed: int = 42, case_count: int = 12) -> EvaluationDataset:
                     document_id=source_id,
                     text=f"Reviewed transport damage to {component} lot {identifier}.",
                     source_type="scrap_review",
-                    metadata={"synthetic": True},
+                    metadata={"synthetic": True, "component_family": component},
                 )
             )
         text = f"Transport damage to {component} lot {identifier}"

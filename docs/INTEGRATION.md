@@ -11,6 +11,7 @@ from packs.scrap import build_pack
 from rag_kit.bootstrap.container import Container
 from rag_kit.bootstrap.settings import Settings
 
+
 async def analisar(ocorrencia, revisoes, metrics):
     async with Container(Settings()) as container:
         facade = container.build_facade(

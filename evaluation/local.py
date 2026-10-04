@@ -7,6 +7,7 @@ import json
 import uuid
 from contextlib import asynccontextmanager
 from dataclasses import dataclass
+from pathlib import Path  # noqa: TC003 - Pydantic evaluates this field annotation at runtime
 from typing import TYPE_CHECKING, Any
 
 from evaluation.baselines.rule_baseline import RuleBaseline
@@ -26,8 +27,6 @@ from rag_kit.domain.models import (
 )
 
 if TYPE_CHECKING:
-    from pathlib import Path
-
     from evaluation.dataset import EvaluationDataset
     from rag_kit.bootstrap.settings import Settings
     from rag_kit.domain.analysis import AnalysisResult, Subject

@@ -1,0 +1,11 @@
+{
+  "dataset_directory": "evaluation/datasets",
+  "output_directory": "evaluation\\reports\\ablation-core-20261004",
+  "split": "dev",
+  "arms": [
+    "A0",
+    "A1"
+  ],
+  "repeat_count": 1,
+  "warmup_cases": 0
+}

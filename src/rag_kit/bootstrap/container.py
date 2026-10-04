@@ -342,8 +342,10 @@ class Container:
             return {"ollama_available": False}
         return {
             "ollama_available": True,
-            "llm_model_present": self.settings.ollama.llm_model in model_names,
-            "embedding_model_present": self.settings.ollama.embed_model in model_names,
+            "llm_model_present": _ollama_model_present(self.settings.ollama.llm_model, model_names),
+            "embedding_model_present": _ollama_model_present(
+                self.settings.ollama.embed_model, model_names
+            ),
         }
 
     def _once(
@@ -372,3 +374,7 @@ class Container:
 
     async def __aexit__(self, *_: object) -> None:
         await self.aclose()
+
+
+def _ollama_model_present(configured: str, installed: set[str]) -> bool:
+    return configured in installed or f"{configured}:latest" in installed
