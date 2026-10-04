@@ -1,4 +1,8 @@
-"""Domain ports for events and event publication.
+"""Domain event bus protocol."""
 
-Pattern: Observer / Port.
-"""
+from typing import Any, Protocol, runtime_checkable
+
+
+@runtime_checkable
+class EventBus(Protocol):
+    async def publish(self, event: Any) -> None: ...

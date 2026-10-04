@@ -26,6 +26,8 @@ dependencies = [
     "structlog",
     "typer",
     "orjson",
+    "psutil",
+    "PyYAML",
 ]
 
 [project.optional-dependencies]
@@ -61,11 +63,14 @@ gateway = [
 ]
 
 [project.scripts]
-rag-kit = "rag_kit.interfaces.cli:app"
+rag-kit = "rag_kit.interfaces.cli:main"
 
 [tool.setuptools.packages.find]
 where = ["src", "."]
 include = ["rag_kit*", "packs*", "evaluation*"]
+
+[tool.setuptools.package-data]
+"packs.scrap" = ["*.yaml", "prompts/*.jinja"]
 
 [tool.ruff]
 line-length = 100
@@ -93,6 +98,9 @@ max-statements = 25
 [tool.ruff.lint.mccabe]
 max-complexity = 8
 
+[tool.ruff.lint.flake8-type-checking]
+runtime-evaluated-base-classes = ["pydantic.BaseModel", "rag_kit.domain.models.Frozen"]
+
 [tool.ruff.lint.per-file-ignores]
 "tests/**" = ["S101", "PLR2004", "ARG001", "ARG002", "PLR0913", "FBT001", "FBT002"]
 "scripts/**" = [
@@ -100,7 +108,7 @@ max-complexity = 8
 ]
 
 [tool.pyright]
-include = ["src", "packs"]
+include = ["src", "packs", "evaluation"]
 pythonVersion = "3.11"
 typeCheckingMode = "strict"
 reportMissingTypeStubs = false
@@ -158,6 +166,7 @@ forbidden_modules = ["rag_kit.application", "rag_kit.bootstrap", "rag_kit.interf
 [[tool.importlinter.contracts]]
 name = "Interfaces never touch infrastructure directly"
 type = "forbidden"
+allow_indirect_imports = true
 source_modules = ["rag_kit.interfaces"]
 forbidden_modules = ["rag_kit.infrastructure"]
 

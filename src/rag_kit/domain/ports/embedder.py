@@ -1,4 +1,13 @@
-"""Port definition for text embedding generation.
+"""Embedding generation protocol."""
 
-Pattern: Port.
-"""
+from collections.abc import Sequence
+from typing import Protocol, runtime_checkable
+
+
+@runtime_checkable
+class Embedder(Protocol):
+    @property
+    def model_id(self) -> str: ...
+    async def embed_documents(self, texts: Sequence[str]) -> list[list[float]]: ...
+    async def embed_query(self, text: str) -> list[float]: ...
+    async def aclose(self) -> None: ...

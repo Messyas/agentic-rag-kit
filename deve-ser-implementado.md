@@ -4421,23 +4421,31 @@ ACCEPTANCE: a new teammate follows README.md and reaches a green `rag-kit check`
 
 ## 27. Progress checklist
 
-- [x] **E0** Foundation: T1 pyproject · T2 skeleton · T3 CLI stub · T4 compose · T5 pre-commit · T6 GPU probe
-- [ ] **E1** Domain: T1 models · T2 analysis/state · T3 errors · T4 ports · T5 fakes + contract tests
-- [ ] **E2** Bootstrap: T1 settings · T2 registry · T3 container
-- [ ] **E3** LLM: T1 Ollama adapter · T2 tracing decorator · T3 retry + breaker · T4 bulkhead/cache · T5 factory stack
-- [ ] **E4** Shared server (P1): T1 gate · T2 strategies · T3 balancer · T4 health · T5 wiring · T6 gateway + ADR
-- [ ] **E5** Embeddings/rerank: T1 Ollama embedder · T2 cache · T3 cross-encoder + null
-- [ ] **E6** pgvector: T1 engine · T2 schema · T3 migration · T4 store · T5 reindex
-- [ ] **E7** Ingestion: T1 loaders · T2 schema mapper · T3 validators · T4 pipeline + report · T5 chunkers · T6 indexing
-- [ ] **E8** Retrieval: T1 dense/lexical · T2 fusion + hybrid · T3 rerank decorator · T4 contextual enrichment · T5 tracing
-- [ ] **E9** Grading: T1 score · T2 LLM · T3 composite
-- [ ] **E10** Generation: T1 prompt registry · T2 builder · T3 structured runner · T4 guards · T5 templates
-- [ ] **E11** Workflow (Proposal A): T1 state · T2 nodes · T3 corrections · T4 workflow + baselines
-- [ ] **E12** Agent (Proposal B): T1 tools · T2 tool-calling strategies · T3 budget · T4 ReAct pipeline
-- [ ] **E13** Facade/CLI: T1 events · T2 facade · T3 CLI · T4 API + worker (P2)
-- [ ] **E14** Scrap pack: T1 contract · T2 schema + facts · T3 tools/query/loaders/columns · T4 prompts
-- [ ] **E15** Evaluation: T1 dataset · T2 synthetic + guards · T3 metrics · T4 runner · T5 baselines · T6 report · T7 calibration
-- [ ] **E16** Tests/architecture · **E17** Observability + masking · **E18** Docs/CI · **E19** Demo mapping · **E20** Hardening
+Implementation update (2026-10-04): see [current status](docs/STATUS.md) and the integration guide.
+The checklist below tracks complete epic acceptance. An unchecked epic can contain implemented modules;
+remaining measurements, optional tasks and integration criteria are stated explicitly.
+
+- [x] **E0** Foundation: packaging, CLI, compose, tooling and GPU probe.
+- [x] **E1** Domain models, states, errors and ports; shared fakes and architecture checks implemented.
+- [x] **E2** Settings, registry, pack discovery and application-scoped container.
+- [x] **E3** Ollama adapter and tracing/retry/breaker/bulkhead/cache factory stack.
+- [x] **E4** Gate, routing, failover/cooldown, factory wiring and periodic backend health monitoring implemented; gateway deployment remains host-owned.
+- [x] **E5** Embedding/reranking adapters and bounded embedding cache implemented; optional-adapter runtime acceptance remains pending.
+- [x] **E6** Engine, additive schema migration, transactional store, source manifests and dependent-run STALE propagation implemented.
+- [x] **E7** Loaders, mapper, validators, normalization, diagnostics, chunkers, atomic indexing and unchanged-source skipping implemented.
+- [ ] **E8** Dense/lexical/hybrid/RRF/reranking/enrichment implemented; measured retrieval diagnostics and ablations pending.
+- [x] **E9** Score, LLM and composite graders implemented.
+- [ ] **E10** Templates, structured runner, guards and bounded repair implemented; compact source aliases and token-budget runtime calibration pending.
+- [x] **E11** Bounded corrective workflow, immutable state and deterministic abstention implemented.
+- [ ] **E12** Native/JSON investigation, typed tools, step/call/time/token limits implemented; real-model acceptance pending.
+- [ ] **E13** Facade, events, CLI, durable idempotent result repository and host-callable API/worker implemented; production API/worker adapters remain host-owned.
+- [x] **E14** Scrap pack, schemas/vocabulary, facts, host mapping, GERP loader and async metrics/tools implemented.
+- [ ] **E15** Dataset, split guards, synthetic generator, baselines, scoped runner, metrics and A0–A5 ablations implemented; calibration and real-model evaluation pending.
+- [ ] **E16** Architecture and unit suite present; coverage target and all optional adapter contracts still need acceptance evidence.
+- [x] **E17** Structured logs, content-free traces, masking/redaction and resource measurement implemented.
+- [x] **E18** Setup, integration documentation, ADRs and quality tooling present.
+- [ ] **E19** Presentations, recordings and measured Demo Day artifacts pending.
+- [ ] **E20** Production hardening remains post-PoC work.
 
 ---
 

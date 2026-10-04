@@ -1,0 +1,45 @@
+# Confirmed against Hanaro Other_Account_Transaction_Text_anonymized.
+# GERP duplicate Description headers are resolved positionally by GerpTsvLoader.
+# occurrence_id is supplied by the host after reconciliation, never invented from TSV.
+columns:
+  - name: organization_code
+    aliases: ["Organization Code", "Organization"]
+    required: true
+    dtype: str
+    sensitive: true
+  - name: transaction_date
+    aliases: ["Transaction Date"]
+    required: true
+    dtype: date
+  - name: item_code
+    aliases: ["Item"]
+    required: true
+    dtype: str
+  - name: receipt_department
+    aliases: ["Receipt Department"]
+    required: false
+    dtype: str
+  - name: item_description
+    aliases: ["Item Desc"]
+    required: false
+    dtype: str
+  - name: item_specification
+    aliases: ["Item Spec", "Item Specification"]
+    required: false
+    dtype: str
+  - name: issue_amount_brl
+    aliases: ["Issue Amount", "Issue Amount BRL"]
+    required: true
+    dtype: decimal
+  - name: issue_quantity
+    aliases: ["Issue Quantity"]
+    required: true
+    dtype: decimal
+  - name: requisition_reason
+    aliases: ["REQ Reason"]
+    required: false
+    dtype: str
+  - name: requisition_comment
+    aliases: ["REQ Comment"]
+    required: false
+    dtype: str

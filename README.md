@@ -1,92 +1,122 @@
 # Agentic RAG Kit
 
-Hexagonal Architecture (Ports and Adapters) with pluggable domain packs.
+Reusable Python 3.11+ module for retrieval, structured analysis and bounded investigation.
+Business schemas, input mappings, prompts and tools live in domain packs. The included
+`scrap` pack accepts canonical host records and GERP exports used by systems such as Hanaro.
 
----
+## Architecture
 
-## 🛠️ Configuração do Ambiente Virtual (venv)
-
-O projeto utiliza um ambiente virtual Python chamado **`arag`**. Você pode configurá-lo e ativá-lo utilizando o Python nativo ou via `uv`.
-
-### 1. Criar o Ambiente Virtual
-
-Se ainda não tiver criado o ambiente:
-
-```bash
-# Usando Python nativo
-python -m venv arag
-
-# Ou usando uv (recomendado para maior velocidade)
-uv venv arag
+```mermaid
+flowchart LR
+  I[CLI / API / worker] --> B[Bootstrap and factories]
+  B --> A[Application and facade]
+  B --> X[Infrastructure adapters]
+  A --> D[Domain protocols and models]
+  X --> D
+  P[Domain packs] --> A
+  P --> D
 ```
 
-### 2. Ativar o Ambiente Virtual
+Domain has no I/O dependencies. Application depends on protocols. Bootstrap composes
+adapters per application and registers pipeline factories. Six import contracts enforce
+these boundaries. Each host may inject its own ports or distribute a pack as an entry point.
 
-#### Windows (PowerShell)
+## Local setup
+
 ```powershell
-.\arag\Scripts\Activate.ps1
-```
-> *Nota: Caso o PowerShell bloqueie a execução de scripts, execute antes:*  
-> `Set-ExecutionPolicy -Scope Process -ExecutionPolicy RemoteSigned`
-
-#### Windows (Prompt de Comando - CMD)
-```cmd
-arag\Scripts\activate.bat
-```
-
-#### Linux / macOS (Bash ou Zsh)
-```bash
-source arag/bin/activate
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+python -m pip install -e ".[dev,eval]"
+Copy-Item .env.example .env
+docker compose up -d db
+rag-kit db upgrade
+ollama pull qwen2.5:7b-instruct-q4_K_M
+ollama pull bge-m3
+rag-kit check
 ```
 
----
+PostgreSQL/pgvector runs in Docker on host port 5433. The CLI runs on the host and uses
+local Ollama. The database schema expects 1024-dimensional embeddings. Optional local
+sentence-transformers and cross-encoder adapters require the `rerank` extra and cached models.
+PyYAML is a declared dependency for column mappings; psutil supplies resource measurements.
 
-## 📦 Instalação de Dependências
+## Commands
 
-Com a venv `arag` ativada:
+```powershell
+# Normalize records and save layout/validation diagnostics alongside JSONL.
+rag-kit ingest export.tsv --output evaluation/ingested
 
-```bash
-# Usando uv (rápido)
-uv pip install -e .
+# Index reviewed evidence with document_id, text, source_type and metadata.
+rag-kit index evaluation/datasets/corpus.jsonl
 
-# Ou usando pip padrão
-pip install -e .
+# Analyze a canonical record with a stable occurrence_id.
+rag-kit analyze occurrence.json
+rag-kit analyze occurrence.json --pipeline react_agent_structured_json
+
+# Validate references, case kinds and dataset separation.
+rag-kit eval --dataset evaluation/datasets --validate-dataset
+
+# Run the configured arms sequentially and save outputs, metrics, manifest and report.
+rag-kit eval --dataset evaluation/datasets
+rag-kit eval --profile evaluation-profile.json
 ```
 
-Para ferramentas de desenvolvimento e linting:
-```bash
-uv pip install ruff pyright pytest import-linter
+The ablation names `A0`–`A5` are available in evaluation profiles. They compare
+dense/hybrid retrieval, reranking, enrichment, corrective RAG and the agent.
+
+An evaluation profile can select the split, arms, repetitions and artifact directory:
+
+```json
+{
+  "dataset_directory": "evaluation/datasets",
+  "output_directory": "evaluation/reports/test-run",
+  "split": "test",
+  "arms": ["rule_baseline", "simple_rag", "corrective_rag"],
+  "repeat_count": 5,
+  "warmup_cases": 2
+}
 ```
 
----
+Each arm receives a fresh container and an isolated corpus namespace; each case is limited
+to its declared sources. Evaluation removes its own indexed sources on completion.
+The supplied synthetic dataset exercises the format and is too small to establish
+production accuracy. Real inference requires the configured models to be installed.
 
-## 🚀 Como Rodar
+## Embed in another system
 
-### Serviços de Suporte (Docker Compose)
-Inicie o banco PostgreSQL com pgvector e a instância do Ollama:
-```bash
-docker compose up -d
+```python
+from rag_kit.bootstrap.container import Container
+from rag_kit.bootstrap.settings import Settings
+
+async def analyze_record(record):
+    async with Container(Settings()) as container:
+        facade = container.build_facade()
+        return await facade.analyze_record(record)
 ```
 
-### Comandos com Makefile
-```bash
-# Ingestão de dados
-make ingest
+`index_documents` atomically replaces the current snapshot of each source. `index_records`
+uses the pack's reviewed-record adapter. Facts and financial values come from host records
+or deterministic tools; model output is validated against schemas, sources and numbers.
+Missing or rejected evidence yields `INSUFFICIENT_EVIDENCE`.
 
-# Rodar avaliação de benchmarks
-make eval
+Pipelines: `corrective_rag`, `simple_rag`, `react_agent_native`,
+`react_agent_structured_json`. Optional ports include host metrics, result storage,
+events, retrieval and chunking. API and worker integration receive an existing facade.
 
-# Executar a aplicação / fluxo
-make run
-```
+See [the integration guide](docs/INTEGRATION.md) for host responsibilities and custom packs,
+[implementation status](docs/STATUS.md) for completed code and outstanding acceptance work,
+and [the original backlog](docs/BACKLOG.md) for the complete plan.
 
-### Execução Direta via Python / CLI
-```bash
-# Linters e checagem de tipos
+## Development
+
+```powershell
 ruff check .
+ruff format --check .
 pyright
-
-# Testes de arquitetura e unitários
-pytest
 lint-imports
+pytest -q
+python -m pip wheel . --no-deps --no-build-isolation --wheel-dir dist
 ```
+
+The wheel includes core modules, the scrap pack, YAML configuration and prompt templates.
+See [Windows setup](docs/SETUP.md) and [contributing](docs/CONTRIBUTING.md).
