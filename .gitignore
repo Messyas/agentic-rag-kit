@@ -24,6 +24,7 @@ __pycache__/
 # Logs and outputs
 *.log
 evaluation/runs/
+evaluation/traces/
 dist/
 build/
 *.egg-info/
