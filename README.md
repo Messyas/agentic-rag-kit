@@ -104,9 +104,38 @@ Pipelines: `corrective_rag`, `simple_rag`, `react_agent_native`,
 `react_agent_structured_json`. Optional ports include host metrics, result storage,
 events, retrieval and chunking. API and worker integration receive an existing facade.
 
+## Scrap drafts and analyst review
+
+The scrap pack can generate local review and report drafts from CSV/XLSX/GERP snapshots,
+validate cited evidence, organize cause hypotheses by the four Ms, and place jobs in a
+SQLite review queue. This queue is a local adapter for the PoC; a host supplies production
+events, persistence, authentication and its review interface.
+
+```powershell
+python scripts/build_demo_spreadsheets.py
+rag-kit draft batch examples/hanaro_contract/demo_scrap.csv --reviews examples/hanaro_contract/demo_reviews.jsonl --limit 4
+rag-kit draft queue
+rag-kit draft show JOB_ID
+rag-kit draft review JOB_ID --decision ACCEPTED
+rag-kit draft retry JOB_ID
+rag-kit draft eval --output evaluation/runs/draft-eval
+rag-kit draft eval-data PATH_TO_ANONYMIZED_EXPORT --limit 12 --output evaluation/runs/hanaro-draft-eval
+```
+
+The example records are synthetic. Acceptance records a local analyst decision; applying
+the mapped payload to a Hanaro report or scrap review belongs to the future host adapter.
+See [the local PoC guide](examples/hanaro_contract/README.md) and
+[the adaptation plan](docs/PLANO_MODULO_HANARO.md) (Portuguese).
+
+The real-data evaluator scores ingestion and evidence integrity without inventing
+cause labels. See [the Hanaro validation results](docs/VALIDACAO_HANARO.md).
+
 See [the integration guide](docs/INTEGRATION.md) for host responsibilities and custom packs,
 [implementation status](docs/STATUS.md) for completed code and outstanding acceptance work,
 and [the original backlog](docs/BACKLOG.md) for the complete plan.
+
+For the planned analyst assistance module and its future Hanaro integration, see
+[the adaptation plan](docs/PLANO_MODULO_HANARO.md) (Portuguese).
 
 ## Development
 

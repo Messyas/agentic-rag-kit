@@ -1,0 +1,62 @@
+{
+  "benchmark": "hanaro_anonymized_transaction_export",
+  "source_name": "Other_Account_Transaction_Text_anonymized",
+  "source_sha256": "e3a39525ffed6f65f5c3f815605716352f01819ba5599bb17652ea111ca07643",
+  "source_rows_read": 1063,
+  "source_rows_accepted": 1063,
+  "layout_adherence": 1.0,
+  "selected_rows": 12,
+  "cases_per_arm": 24,
+  "per_case_timeout_s": 90,
+  "resumed_existing_results": true,
+  "selected_row_indices": [
+    13,
+    67,
+    0,
+    16,
+    241,
+    297,
+    184,
+    317,
+    712,
+    655,
+    917,
+    845
+  ],
+  "model": "qwen2.5:7b-instruct-q4_K_M",
+  "arms": {
+    "rule_baseline": {
+      "cases": 24,
+      "failures": 0,
+      "checks": {
+        "schema_valid": 24,
+        "citation_ids_valid": 24,
+        "claim_quotes_literal": 24,
+        "hypothesis_observations_literal": 24,
+        "source_scope_valid": 24,
+        "no_cause_marked_confirmed": 24
+      },
+      "mean_latency_s": 0.0014503666667072441,
+      "hypothesis_rate": 0.0
+    },
+    "local_rag": {
+      "cases": 24,
+      "failures": 1,
+      "checks": {
+        "schema_valid": 23,
+        "citation_ids_valid": 23,
+        "claim_quotes_literal": 23,
+        "hypothesis_observations_literal": 23,
+        "source_scope_valid": 23,
+        "no_cause_marked_confirmed": 23
+      },
+      "mean_latency_s": 7.1265490652173415,
+      "hypothesis_rate": 0.2608695652173913
+    }
+  },
+  "unscored": [
+    "4M cause precision/recall: no human-reviewed cause labels in source export",
+    "narrative usefulness: requires blind analyst review"
+  ],
+  "note": "Structural/evidence-integrity benchmark on real anonymized rows; not a causal-accuracy benchmark."
+}

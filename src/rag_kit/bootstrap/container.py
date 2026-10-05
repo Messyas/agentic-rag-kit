@@ -9,6 +9,8 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Any, TypeVar, cast
 
 import httpx
+from packs.scrap.assistant import ScrapAssistantFacade
+from packs.scrap.draft_jobs import DraftJobService
 from sqlalchemy import text
 from sqlalchemy.exc import SQLAlchemyError
 
@@ -54,6 +56,7 @@ from rag_kit.infrastructure.embeddings.st_embedder import SentenceTransformerEmb
 from rag_kit.infrastructure.loaders.csv_loader import CsvLoader
 from rag_kit.infrastructure.loaders.xlsx_loader import XlsxLoader
 from rag_kit.infrastructure.observability.tracer import JsonlTracer
+from rag_kit.infrastructure.persistence.draft_queue import SqliteDraftQueue
 from rag_kit.infrastructure.persistence.pgvector.engine import (
     DatabaseRuntime,
     build_engine,
@@ -89,6 +92,16 @@ class Container:
             return loader.load(path)
         loader = XlsxLoader() if path.suffix.lower() == ".xlsx" else CsvLoader()
         return loader.load(path)
+
+    def build_scrap_assistant(self) -> ScrapAssistantFacade:
+        """Compose a local, source-grounded draft generator without a database connection."""
+        return ScrapAssistantFacade(self.llm, self.settings.ollama.llm_model)
+
+    def build_draft_queue(self, path: Path) -> SqliteDraftQueue:
+        return SqliteDraftQueue(path)
+
+    def build_draft_jobs(self, path: Path) -> DraftJobService:
+        return DraftJobService(self.build_draft_queue(path), self.build_scrap_assistant())
 
     @property
     def pack(self) -> PackSpec:

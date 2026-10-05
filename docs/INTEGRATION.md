@@ -95,3 +95,28 @@ O adaptador PostgreSQL atual usa vetores de **1024 dimensões**. Outros modelos
 de embeddings precisam ser compatíveis com essa dimensão ou receber outro
 adaptador/schema. API FastAPI e função de worker são interfaces opcionais;
 o host configura autenticação, broker e execução das tarefas.
+
+## Geração de drafts scrap e revisão humana
+
+O módulo pronto para acoplamento recebe snapshots imutáveis do host em
+`ReviewRequest` ou `ReportRequest`. Cada evidência carrega organização,
+identidade da fonte, versão e escopo de acesso. O host deve autorizar as fontes
+antes de montar esses objetos. Dossiers de relatório só recuperam ocorrências
+selecionadas e métricas enviadas no próprio pedido; uma revisão individual pode
+consultar revisões aprovadas semelhantes, sempre identificadas como hipótese.
+
+```python
+async with Container(Settings()) as container:
+    assistant = container.build_scrap_assistant()
+    draft = await assistant.draft_report(report_request)
+    # Validar a versão atual no host antes de aplicar qualquer payload.
+```
+
+`packs.scrap.host_mapping` converte um draft aprovado em comandos compatíveis
+com `ScrapReviewWrite`, `ReportUpdate` e `ReportSectionsUpdate`. A camada de
+integração do Hanaro ainda precisa autenticar o analista, buscar snapshots com
+escopo de tenant, persistir os jobs, apresentar a fila e aplicar as mutações com
+controle otimista de versão. Os mapeadores preservam campos não sugeridos e
+recusam drafts incompletos ou versões desatualizadas. O SQLite e a CLI incluídos
+são adaptadores locais para desenvolvimento e avaliação; implemente os mesmos
+limites com os repositórios, fila e interface do host em produção.

@@ -1,0 +1,122 @@
+{
+  "benchmark": "hanaro_anonymized_transaction_export",
+  "source_name": "Other_Account_Transaction_Text_anonymized",
+  "source_sha256": "e3a39525ffed6f65f5c3f815605716352f01819ba5599bb17652ea111ca07643",
+  "source_rows_read": 1063,
+  "source_rows_accepted": 1063,
+  "layout_adherence": 1.0,
+  "selected_rows": 12,
+  "cases_per_arm": 48,
+  "unique_cases_per_arm": 24,
+  "repetitions": 2,
+  "per_case_timeout_s": 90,
+  "resumed_existing_results": true,
+  "selected_row_indices": [
+    13,
+    67,
+    0,
+    16,
+    241,
+    297,
+    184,
+    317,
+    712,
+    655,
+    917,
+    845
+  ],
+  "model": "qwen2.5:7b-instruct-q4_K_M",
+  "arms": {
+    "rule_baseline": {
+      "cases": 48,
+      "failures": 0,
+      "checks": {
+        "schema_valid": 48,
+        "citation_ids_valid": 48,
+        "claim_quotes_literal": 48,
+        "hypothesis_observations_literal": 48,
+        "source_scope_valid": 48,
+        "no_cause_marked_confirmed": 48
+      },
+      "mean_latency_s": 0.0013218229166748567,
+      "p95_latency_s": 0.001899699999967197,
+      "hypothesis_rate": 0.0,
+      "field_metric_scope": "exact literal item_description and requisition_comment fields only",
+      "field_tp": 64,
+      "field_fp": 0,
+      "field_fn": 0,
+      "field_accuracy": 1.0,
+      "field_precision": 1.0,
+      "field_recall": 1.0,
+      "field_f1": 1.0,
+      "completion_tokens_total": 0,
+      "mean_generation_tokens_per_s": null,
+      "peak_process_ram_gb": 0.108847104,
+      "repeat_consistency": {
+        "consistent_groups": 24,
+        "eligible_groups": 24,
+        "rate": 1.0
+      },
+      "by_kind": {
+        "review": {
+          "successful_cases": 24,
+          "mean_latency_s": 0.0013697458333107686,
+          "p95_latency_s": 0.0020918000000165193
+        },
+        "report": {
+          "successful_cases": 24,
+          "mean_latency_s": 0.0012739000000389449,
+          "p95_latency_s": 0.0017164000000775559
+        }
+      }
+    },
+    "local_rag": {
+      "cases": 48,
+      "failures": 0,
+      "checks": {
+        "schema_valid": 48,
+        "citation_ids_valid": 48,
+        "claim_quotes_literal": 48,
+        "hypothesis_observations_literal": 48,
+        "source_scope_valid": 48,
+        "no_cause_marked_confirmed": 48
+      },
+      "mean_latency_s": 5.901504406250003,
+      "p95_latency_s": 16.391939000000093,
+      "hypothesis_rate": 0.3333333333333333,
+      "field_metric_scope": "exact literal item_description and requisition_comment fields only",
+      "field_tp": 64,
+      "field_fp": 0,
+      "field_fn": 0,
+      "field_accuracy": 1.0,
+      "field_precision": 1.0,
+      "field_recall": 1.0,
+      "field_f1": 1.0,
+      "completion_tokens_total": 18201,
+      "mean_generation_tokens_per_s": null,
+      "peak_process_ram_gb": 0.541913088,
+      "repeat_consistency": {
+        "consistent_groups": 8,
+        "eligible_groups": 24,
+        "rate": 0.3333333333333333
+      },
+      "by_kind": {
+        "review": {
+          "successful_cases": 24,
+          "mean_latency_s": 3.4618326375,
+          "p95_latency_s": 9.44452229999979
+        },
+        "report": {
+          "successful_cases": 24,
+          "mean_latency_s": 8.341176175000006,
+          "p95_latency_s": 20.15299519999985
+        }
+      }
+    }
+  },
+  "unscored": [
+    "4M cause precision/recall: no human-reviewed cause labels in source export",
+    "narrative usefulness: requires blind analyst review"
+  ],
+  "note": "Structural/evidence-integrity benchmark on real anonymized rows; not a causal-accuracy benchmark."
+}

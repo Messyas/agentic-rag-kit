@@ -1,0 +1,5 @@
+Organization Code,Transaction Date,Item,Item Desc,Issue Amount BRL,Issue Quantity,REQ Comment,Receipt Department
+F1,2026-09-10,AX-11,Conjunto de eixo,-125.40,-2,Ajuste da máquina fora do padrão,Montagem
+F1,2026-09-11,BX-20,Chapa metálica,-78.00,-3,Material recebido com deformação,Montagem
+F1,2026-09-12,CX-30,Componente de fixação,-50.00,-1,Sequência de montagem não seguida,Montagem
+F1,2026-09-13,DX-40,Peça genérica,-25.00,-1,scrap,Montagem

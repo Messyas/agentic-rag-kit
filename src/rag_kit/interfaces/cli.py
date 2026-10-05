@@ -8,17 +8,24 @@ import sys
 from dataclasses import asdict
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import Annotated
+from typing import TYPE_CHECKING, Annotated, cast
 
 import typer
 from evaluation.dataset import load_dataset
+from evaluation.draft_eval import DraftEvalOptions, evaluate_drafts
+from evaluation.hanaro_draft_eval import HanaroEvalOptions, evaluate_hanaro_data
 from evaluation.local import LocalEvaluationOptions, evaluate_local
+from packs.scrap.assistant_schemas import AssistantDraft, ReportRequest, ReviewRequest
+from packs.scrap.local_batch import build_local_requests, reviewed_evidence
 from pydantic import TypeAdapter
 
 from rag_kit.application.ingestion.pipeline import prepare_table
 from rag_kit.bootstrap.container import Container
 from rag_kit.bootstrap.settings import Settings
 from rag_kit.domain.models import Document, SourceRef
+
+if TYPE_CHECKING:
+    from rag_kit.domain.draft_jobs import ReviewState
 
 app = typer.Typer(
     name="rag-kit",
@@ -27,6 +34,232 @@ app = typer.Typer(
 )
 database_app = typer.Typer(help="Manage the local PostgreSQL/pgvector schema.")
 app.add_typer(database_app, name="db")
+draft_app = typer.Typer(help="Generate local scrap drafts and review the queue.")
+app.add_typer(draft_app, name="draft")
+
+
+@draft_app.command("batch")
+def draft_batch(
+    files: Annotated[list[Path], typer.Argument(exists=True, readable=True)],
+    queue_path: Annotated[Path, typer.Option("--queue")] = Path("evaluation/runs/drafts.sqlite3"),
+    limit: Annotated[int | None, typer.Option("--limit", min=1)] = None,
+    reviews: Annotated[Path | None, typer.Option("--reviews", exists=True, readable=True)] = None,
+) -> None:
+    """Ingest spreadsheets and generate reviewable drafts automatically."""
+    asyncio.run(_draft_batch(files, queue_path, limit, reviews))
+
+
+async def _draft_batch(
+    files: list[Path], queue_path: Path, limit: int | None, reviews: Path | None
+) -> None:
+    settings = Settings()
+    _require_local_llm(settings)
+    async with Container(settings) as container:
+        jobs = container.build_draft_jobs(queue_path)
+        review_text = (
+            await asyncio.to_thread(reviews.read_text, encoding="utf-8") if reviews else ""
+        )
+        reviewed = reviewed_evidence(
+            [json.loads(line) for line in review_text.splitlines() if line.strip()]
+        )
+        accepted = 0
+        created = 0
+        for file_path in files:
+            if file_path.suffix.lower() not in {".csv", ".xlsx", ".tsv", ".txt", ""}:
+                raise typer.BadParameter(f"unsupported file type: {file_path.suffix}")  # noqa: TRY003
+            table = container.load_table(file_path)
+            prepared = prepare_table(table, container.pack.column_specs)
+            remaining = None if limit is None else max(limit - accepted, 0)
+            pairs = build_local_requests(
+                prepared.rows, file_path.name, limit=remaining, reviewed=reviewed
+            )
+            accepted += len(pairs)
+            created += len(jobs.enqueue_batch([request for pair in pairs for request in pair]))
+            typer.echo(
+                json.dumps(
+                    {
+                        "file": str(file_path),
+                        "rows_read": len(table.rows),
+                        "rows_valid": len(prepared.rows),
+                        "layout_adherence": prepared.layout.adherence,
+                        "draft_pairs_queued": len(pairs),
+                    },
+                    ensure_ascii=False,
+                )
+            )
+            if limit is not None and accepted >= limit:
+                break
+        completed = 0
+        failed = 0
+        while job := await jobs.process_one():
+            completed += job.job_state == "COMPLETED"
+            failed += job.job_state == "FAILED"
+        typer.echo(json.dumps({"jobs_seen": created, "completed": completed, "failed": failed}))
+
+
+def _require_local_llm(settings: Settings) -> None:
+    from urllib.parse import urlparse  # noqa: PLC0415 - local policy only used by draft commands
+
+    endpoints = (
+        [backend.url for backend in settings.llm.balancer.backends]
+        if settings.llm.balancer and settings.llm.balancer.backends
+        else [settings.ollama.host if settings.llm.provider == "ollama" else settings.llm.base_url]
+    )
+    if any(urlparse(url).hostname not in {"localhost", "127.0.0.1", "::1"} for url in endpoints):
+        raise typer.BadParameter("draft batch requires a local LLM endpoint")  # noqa: TRY003
+
+
+@draft_app.command("queue")
+def draft_queue(
+    queue_path: Annotated[Path, typer.Option("--queue")] = Path("evaluation/runs/drafts.sqlite3"),
+) -> None:
+    """Show generated drafts waiting for analyst review."""
+    queue = Container(Settings()).build_draft_queue(queue_path)
+    for job in queue.list():
+        typer.echo(
+            json.dumps(
+                {
+                    "job_id": job.job_id,
+                    "subject_id": job.subject_id,
+                    "kind": job.kind,
+                    "job_state": job.job_state,
+                    "review_state": job.review_state,
+                    "attempts": job.attempts,
+                },
+                ensure_ascii=False,
+            )
+        )
+
+
+@draft_app.command("submit")
+def draft_submit(
+    request_file: Annotated[Path, typer.Argument(exists=True, readable=True)],
+    queue_path: Annotated[Path, typer.Option("--queue")] = Path("evaluation/runs/drafts.sqlite3"),
+) -> None:
+    """Queue one versioned host-style review or report request."""
+    _require_local_llm(Settings())
+    data = json.loads(request_file.read_text(encoding="utf-8"))
+    request = (
+        ReviewRequest.model_validate(data)
+        if "occurrence_id" in data
+        else ReportRequest.model_validate(data)
+    )
+
+    async def submit() -> None:
+        async with Container(Settings()) as container:
+            jobs = container.build_draft_jobs(queue_path)
+            typer.echo(jobs.enqueue(request).model_dump_json(indent=2))
+
+    asyncio.run(submit())
+
+
+@draft_app.command("run")
+def draft_run(
+    queue_path: Annotated[Path, typer.Option("--queue")] = Path("evaluation/runs/drafts.sqlite3"),
+) -> None:
+    """Process queued local drafts with the configured local model."""
+    asyncio.run(_draft_run(queue_path))
+
+
+@draft_app.command("eval")
+def draft_evaluate(
+    output: Annotated[Path, typer.Option("--output")] = Path("evaluation/runs/draft-eval"),
+    repetitions: Annotated[int, typer.Option("--repetitions", min=1)] = 1,
+) -> None:
+    """Compare deterministic and local LLM drafts on the same synthetic cases."""
+    settings = Settings()
+    _require_local_llm(settings)
+    result = asyncio.run(
+        evaluate_drafts(
+            settings,
+            DraftEvalOptions(
+                cases_path=Path("evaluation/datasets/draft_cases.jsonl"),
+                source_path=Path("examples/hanaro_contract/demo_scrap.csv"),
+                reviews_path=Path("examples/hanaro_contract/demo_reviews.jsonl"),
+                output_dir=output,
+                repetitions=repetitions,
+            ),
+        )
+    )
+    typer.echo(json.dumps(result, ensure_ascii=False, indent=2))
+
+
+@draft_app.command("eval-data")
+def draft_evaluate_data(
+    source_path: Annotated[Path, typer.Argument(exists=True, readable=True)],
+    output: Annotated[Path, typer.Option("--output")] = Path("evaluation/runs/hanaro-draft-eval"),
+    limit: Annotated[int, typer.Option("--limit", min=1, max=250)] = 24,
+    resume: Annotated[bool, typer.Option("--resume")] = False,  # noqa: FBT002 - CLI flag
+    repetitions: Annotated[int, typer.Option("--repetitions", min=1, max=10)] = 3,
+) -> None:
+    """Benchmark evidence integrity on stratified anonymized Hanaro rows."""
+    settings = Settings()
+    _require_local_llm(settings)
+    result = asyncio.run(
+        evaluate_hanaro_data(
+            settings, HanaroEvalOptions(source_path, output, limit, resume, repetitions)
+        )
+    )
+    typer.echo(json.dumps(result, ensure_ascii=False, indent=2))
+
+
+async def _draft_run(queue_path: Path) -> None:
+    settings = Settings()
+    _require_local_llm(settings)
+    async with Container(settings) as container:
+        jobs = container.build_draft_jobs(queue_path)
+        while job := await jobs.process_one():
+            typer.echo(
+                json.dumps(
+                    {
+                        "job_id": job.job_id,
+                        "job_state": job.job_state,
+                        "review_state": job.review_state,
+                        "error": job.error,
+                    },
+                    ensure_ascii=False,
+                )
+            )
+
+
+@draft_app.command("show")
+def draft_show(
+    job_id: str,
+    queue_path: Annotated[Path, typer.Option("--queue")] = Path("evaluation/runs/drafts.sqlite3"),
+) -> None:
+    """Inspect a draft, its 4M matrix, citations and gaps."""
+    job = Container(Settings()).build_draft_queue(queue_path).get(job_id)
+    if job.result_json is None:
+        typer.echo(job.model_dump_json(indent=2))
+        return
+    typer.echo(AssistantDraft.model_validate_json(job.result_json).model_dump_json(indent=2))
+
+
+@draft_app.command("review")
+def draft_review(
+    job_id: str,
+    decision: Annotated[str, typer.Option("--decision")],
+    queue_path: Annotated[Path, typer.Option("--queue")] = Path("evaluation/runs/drafts.sqlite3"),
+) -> None:
+    """Record a local review decision; the future host applies approved content."""
+    if decision not in {"ACCEPTED", "REJECTED", "NEEDS_INFORMATION"}:
+        raise typer.BadParameter("decision must be ACCEPTED, REJECTED or NEEDS_INFORMATION")  # noqa: TRY003
+    job = (
+        Container(Settings())
+        .build_draft_queue(queue_path)
+        .review(job_id, cast("ReviewState", decision))
+    )
+    typer.echo(job.model_dump_json(indent=2))
+
+
+@draft_app.command("retry")
+def draft_retry(
+    job_id: str,
+    queue_path: Annotated[Path, typer.Option("--queue")] = Path("evaluation/runs/drafts.sqlite3"),
+) -> None:
+    """Requeue a failed job while it remains under the attempt limit."""
+    job = Container(Settings()).build_draft_queue(queue_path).retry(job_id)
+    typer.echo(job.model_dump_json(indent=2))
 
 
 @app.command()
